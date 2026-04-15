@@ -7,6 +7,7 @@ import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.
 import 'package:hiddify/core/router/go_router/helper/custom_transition.dart';
 import 'package:hiddify/core/router/go_router/refresh_listenable.dart';
 import 'package:hiddify/features/about/widget/about_page.dart';
+import 'package:hiddify/features/nexus_auth/nexus_login_page.dart';
 import 'package:hiddify/features/home/widget/home_page.dart';
 import 'package:hiddify/features/intro/widget/intro_page.dart';
 import 'package:hiddify/features/log/overview/logs_page.dart';
@@ -64,7 +65,9 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
     return RoutingConfig(
       redirect: (context, state) {
         final introCompleted = ref.read(Preferences.introCompleted);
+        final nexusToken = ref.read(Preferences.nexusAuthToken);
         final isIntro = state.matchedLocation == '/intro';
+        final isLogin = state.matchedLocation == '/login';
         // fix path-parameters for deep link
         String? url;
         if (LinkParser.protocols.contains(state.uri.scheme)) {
@@ -74,6 +77,13 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
           newUrlFromAppLink = '';
         } else if (state.uri.queryParameters['url'] != null) {
           url = state.uri.queryParameters['url'];
+        }
+
+        // Nexus auth check — must login first
+        if (nexusToken.isEmpty && !isLogin) {
+          return '/login';
+        } else if (nexusToken.isNotEmpty && isLogin) {
+          return '/home';
         }
 
         if (!introCompleted) {
@@ -247,6 +257,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
           ],
         ),
         GoRoute(name: 'intro', path: '/intro', builder: (_, _) => const IntroPage()),
+        GoRoute(name: 'login', path: '/login', builder: (_, _) => const NexusLoginPage()),
       ],
     );
   }
