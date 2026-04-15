@@ -35,17 +35,13 @@ jobs:
       - name: Setup NDK
         run: echo "y" | sdkmanager "ndk;28.2.13676358" --channel=0
 
-      - name: Download hiddify-core prebuilt
+      - name: Download hiddify-core via Makefile
         run: |
-          CORE_VERSION=$(grep 'core.version' dependencies.properties | cut -d= -f2)
-          CORE_URL="https://github.com/hiddify/hiddify-next-core/releases/download/v${CORE_VERSION}/hiddify-lib-android.tar.gz"
-          mkdir -p android/app/libs
-          curl -fsSL "$CORE_URL" | tar xz -C android/app/libs/
-
-      - name: Copy proto files from submodule (stub)
-        run: |
-          # Create empty proto dirs so rsync steps don't fail
-          mkdir -p android/app/src/main/protos
+          set -e
+          make android-libs
+          echo "=== Checking downloaded libs ==="
+          find android/app/libs -type f | head -30
+          ls -lh android/app/libs/ || echo "libs dir empty!"
 
       - name: Install Flutter dependencies
         run: flutter pub get
