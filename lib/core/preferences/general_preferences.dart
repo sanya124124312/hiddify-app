@@ -23,17 +23,6 @@ abstract class Preferences {
     overrideValue: _debugIntroPage && kDebugMode ? false : null,
   );
 
-  // ── Nexus auth ──────────────────────────────────────────────
-  static final nexusAuthToken = PreferencesNotifier.create<String, String>(
-    "nexus_auth_token",
-    "",
-  );
-
-  static final nexusSubUrl = PreferencesNotifier.create<String, String>(
-    "nexus_sub_url",
-    "",
-  );
-
   // Null means that auto selection has not been performed yet.
   static final autoAppsSelectionRegion = PreferencesNotifier.create<Region?, String?>(
     "auto_apps_selection_region",
